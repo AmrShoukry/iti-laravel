@@ -2,153 +2,109 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\PostDetailsResponse;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PostController extends Controller
 {
     public function index() {
-        $posts = [
-            [
-                'id' => 1,
-                'title' => 'first post',
-                'description' => 'some description',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Ahmed',
-                    'email' => 'ahmed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-            ],
-            [
-                'id' => 2,
-                'title' => 'second post',
-                'description' => 'some description 2',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Mohamed',
-                    'email' => 'mohamed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'third post',
-                    'description' => 'some description 2',
-                    'created_at' => '2026-03-11 10:00:00',
-                    'creator' => [
-                        'name' => 'Ali',
-                        'email' => 'Ali@gmail.com',
-                        'created_at' => '2024-09-01 08:00:00'
-                    ]
-                ]
-        ];
+        $posts = Post::withTrashed()->paginate(10);
 
         return view('posts.index', [
             'posts' => $posts
         ]);
     }
 
-    public function show($post) {
+    public function show($id) {
 
-        $posts = [
-            [
-                'id' => 1,
-                'title' => 'first post',
-                'description' => 'some description',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Ahmed',
-                    'email' => 'ahmed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-            ],
-            [
-                'id' => 2,
-                'title' => 'second post',
-                'description' => 'some description 2',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Mohamed',
-                    'email' => 'mohamed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'third post',
-                    'description' => 'some description 2',
-                    'created_at' => '2026-03-11 10:00:00',
-                    'creator' => [
-                        'name' => 'Ali',
-                        'email' => 'Ali@gmail.com',
-                        'created_at' => '2024-09-01 08:00:00'
-                    ]
-                ]
-        ];
-
+        $post = Post::with('comments.user')->findOrFail($id);
 
         return view('posts.show', [
-            'post' => $posts[(int) $post - 1]
+            'post'=> $post
         ]);
     }
 
     public function create() {
-        return view('posts.create');
-    }
 
-    public function store() {
-        return to_route('posts.index');
-    }
+        $users = User::all();
 
-    public function edit($post) {
-        $posts = [
-            [
-                'id' => 1,
-                'title' => 'first post',
-                'description' => 'some description',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Ahmed',
-                    'email' => 'ahmed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-            ],
-            [
-                'id' => 2,
-                'title' => 'second post',
-                'description' => 'some description 2',
-                'created_at' => '2026-03-11 10:00:00',
-                'creator' => [
-                    'name' => 'Mohamed',
-                    'email' => 'mohamed@gmail.com',
-                    'created_at' => '2024-09-01 08:00:00'
-                ]
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'third post',
-                    'description' => 'some description 2',
-                    'created_at' => '2026-03-11 10:00:00',
-                    'creator' => [
-                        'name' => 'Ali',
-                        'email' => 'Ali@gmail.com',
-                        'created_at' => '2024-09-01 08:00:00'
-                    ]
-                ]
-        ];
-
-        $currentPost = $posts[(int) $post - 1];
-
-        return view('posts.edit', [
-            'post' => $currentPost
+        return view('posts.create', [
+            'users' => $users
         ]);
     }
 
-    public function update() {
+    public function store() {
+        $title = request('title');
+        $user_id = request('user_id');
+        $description = request('description');
+
+        Post::create([
+            'title' => $title,
+            'description' => $description,
+            'user_id' => $user_id
+        ]);
+
         return to_route('posts.index');
     }
 
-    public function destroy() {
+    public function edit($id) {
+        $post = Post::findOrFail($id);
+        $users = User::all();
+
+        return view('posts.edit', [
+            'post' => $post,
+            'users' => $users
+        ]);
+    }
+
+    public function update($id) {
+        $post = Post::findOrFail($id);
+
+        $post->update([
+            'title' => request('title'),
+            'description' => request('description'),
+            'user_id' => request('user_id')
+        ]);
+
         return to_route('posts.index');
+    }
+
+    public function destroy($id) {
+        $post = Post::findOrFail($id);
+        $post->delete();
+
+        return to_route('posts.index');
+    }
+
+    public function getDetails($id) {
+        $post = Post::findOrFail($id);
+        return new PostDetailsResponse($post);
+    }
+
+
+    public function getPosts() {
+        $posts = Post::withTrashed()->with(['user', 'comments.user'])->paginate(10);
+        $users = User::all();
+
+        return Inertia::render('Posts/Index', [
+            'posts' => $posts,
+            'users' => $users,
+        ]);
+    }
+
+    public function toggleSoftDelete($id)
+    {
+        $post = Post::withTrashed()->findOrFail($id);
+
+        if ($post->trashed()) {
+            $post->restore();
+        } else {
+            $post->delete();
+        }
+
+        return back();
     }
 }

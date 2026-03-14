@@ -18,6 +18,7 @@
                         <input
                             type="text"
                             id="title"
+                            name="title"
                             value={{ $post['title'] }}
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 border"
                         >
@@ -28,6 +29,7 @@
                         <textarea
                             id="description"
                             rows="5"
+                            name="description"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 border"
                         >{{ $post['description'] }}</textarea>
                     </div>
@@ -39,9 +41,15 @@
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-2 px-3 border bg-white"
                             selected="2"
                             >
-                            <option value="1" {{ $post['creator']['name'] == 'Ahmed' ? 'selected' : '' }}>Ahmed</option>
-                            <option value="2" {{ $post['creator']['name'] == 'Mohamed' ? 'selected' : '' }}>Mohamed</option>
-                            <option value="3" {{ $post['creator']['name'] == 'Ali' ? 'selected' : '' }}>Ali</option>
+                            @foreach($users as $user)
+                            <option
+                                value="{{ $user['id'] }}"
+                                {{ $post['user']['id'] == $user['id'] ? 'selected' : '' }}
+                            >
+                                {{ $user['name'] }}
+                            </option>
+                            @endforeach
+
                         </select>
                     </div>
 
