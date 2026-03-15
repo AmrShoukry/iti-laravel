@@ -16,6 +16,23 @@
                     <h3 class="text-lg font-medium text-gray-800">Description :-</h3>
                     <p class="text-gray-600">{{ $post['description'] }}</p>
                 </div>
+                <div class="mb-2">
+                    <h3 class="text-lg font-medium text-gray-800">
+                        Tags:
+                        @if($post->tags->isNotEmpty())
+                            @foreach($post->tags as $tag)
+                                <span class="font-normal">{{ $tag->name }}</span>@if(!$loop->last), @endif
+                            @endforeach
+                        @else
+                            <span class="font-normal text-red-400">No tags</span>
+                        @endif
+                    </h3>                </div>
+
+                @if($post->image)
+                    <div>
+                        <img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" style="max-width:200px;">
+                    </div>
+                @endif
             </div>
         </div>
 

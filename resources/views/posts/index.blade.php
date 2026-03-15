@@ -9,6 +9,14 @@
            </a>
        </div>
 
+        <form method="POST" action="{{ route('posts.restore') }}" class="text-center">
+           @csrf
+            <button type="submit" href="{{ route('posts.create') }}" class="mt-4 px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+               Restore Posts
+           </button>
+       </form>
+
+
 
        <!-- Table Component -->
        <div class="mt-6 rounded-lg border border-gray-200">
@@ -18,6 +26,7 @@
                        <tr>
                            <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">#</th>
                            <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">Title</th>
+                           <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">Slug</th>
                            <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">Posted By</th>
                            <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">Created At</th>
                            <th class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">Actions</th>
@@ -28,6 +37,7 @@
                        <tr>
                            <td class="px-4 py-2 font-medium whitespace-nowrap text-gray-900">{{$post['id']}}</td>
                            <td class="px-4 py-2 whitespace-nowrap text-gray-700">{{$post['title']}}</td>
+                           <td class="px-4 py-2 whitespace-nowrap text-gray-700">{{$post['slug']}}</td>
                            <td class="px-4 py-2 whitespace-nowrap text-gray-700">{{$post?->user?->name}}</td>
                            <td class="px-4 py-2 whitespace-nowrap text-gray-700">{{ $post->created_at->toDateString()  }}</td>
                            <td class="px-4 py-2 whitespace-nowrap text-gray-700 space-x-2">

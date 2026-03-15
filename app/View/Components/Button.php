@@ -15,7 +15,7 @@ class Button extends Component
     private array $classes = [
         'primary' => 'bg-blue-500 text-white',
         'secondary' => 'bg-gray-500 text-white',
-        'danger' => 'bg-red-500 text-white',
+        'danger' => 'bg-blue-500 text-white',
     ];
 
     public function __construct(string $type)
